@@ -1,34 +1,113 @@
 package com.rohitkalhans.sedna.io;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.rohitkalhans.sedna.config.QueueConfig;
+import com.rohitkalhans.sedna.stage.Lifecycle;
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.broker.BrokerService;
+
+import javax.jms.*;
 
 /**
  * Created by rohit.kalhans on 21/12/14.
  */
 
-public class SedaQueue implements PubSub{
-    private final List<Subscriber> subscribers;
+public class SedaQueue implements Lifecycle {
+    private final String INBOUND_QUEUE= "SEDNA_IN";
+    private final String OUTBOUND_QUEUE= "SEDNA_OUT";
+    private BrokerService brokerService;
+    private QueueConfig config;
+    private ActiveMQConnectionFactory connectionFactory;
+    private ThreadLocal<Connection> threadConnection;
 
-    SedaQueue(){
-        subscribers= new ArrayList<Subscriber>();
+    private Connection getConnection() throws JMSException{
+       if(threadConnection.get() == null)
+           threadConnection.set(connectionFactory.createConnection());
+        return threadConnection.get();
     }
 
-    @Override
-    public void publish() {
-        //handle writing to the queue
+
+    public SedaQueue(QueueConfig config){
+        this.config= config;
+
+        // "By default we will use Active MQ All those who wish
+        // to oppose this must speak now or must hold their
+        // silence for ever.
+        // No one spoke. Good! By the power vested in me (as the programmer
+        // of this software), I now pronounce ActiveMQ DEFAULT QUEUE for SEDNA
+        // you may now initialize the broker"
+
+        BrokerService broker = new BrokerService();
+
+        // ------- Somewhere in the deep dark corner of his house the sobs of ZeroMQ was heard by a few ---------
+
+        connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
     }
 
-    @Override
-    public void subscribe(Subscriber subscriber) {
-        subscribers.add(subscriber);
-
-    }
 
     @Override
-    public void notifySubscribers() {
-        for(Subscriber s: subscribers){
-            s.notifyEvent();
+    public boolean init(){
+        try {
+            brokerService.addConnector("tcp://localhost:" + config.getQueuePort());
+            brokerService.start();
+            return true;
+        }
+        catch (Exception ex){
+            return false;
         }
     }
+
+    @Override
+    public void pause() {
+        throw new UnsupportedOperationException(" The current Queue implementation cant be paused. ");
+
+    }
+
+    @Override
+    public boolean stop() {
+        try {
+            brokerService.stop();
+            return true;
+        }
+        catch(Exception ex) {
+            return false;
+        }
+    }
+
+    public void writeOut(Message message) throws JMSException
+    {
+        writeOut(message,null);
+    }
+
+
+    public void  writeOut(Message message, String OutboundQueue) throws JMSException {
+        Connection con = getConnection();
+        con.start();
+        Session session = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        Destination destination = session.createQueue((OutboundQueue== null)?OUTBOUND_QUEUE:OutboundQueue);
+        MessageProducer producer = session.createProducer(destination);
+        producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+        producer.send(destination,message);
+        session.close();
+        //con.stop();
+    }
+
+
+    // todo: fix this  method since this not the correct way of adding a message listener.
+    public boolean registerListener( MessageListener listener)
+    {
+        try {
+            Connection con = getConnection();
+            con.start();
+            Session session = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            Destination destination = session.createQueue(OUTBOUND_QUEUE);
+            MessageConsumer consumer = session.createConsumer(destination);
+            consumer.setMessageListener(listener);
+        }catch (JMSException ex){
+            return false;
+        }
+        return true;
+    }
+
+    //todo: figure out how to unregister a dispacher.
+
 }

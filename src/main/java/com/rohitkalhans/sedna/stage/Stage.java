@@ -1,6 +1,6 @@
 package com.rohitkalhans.sedna.stage;
 
-import com.rohitkalhans.sedna.controllers.StageController;
+import com.rohitkalhans.sedna.config.StageConfig;
 import com.rohitkalhans.sedna.io.SedaQueue;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,26 +23,35 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public abstract class Stage implements Lifecycle {
-    private SedaQueue inboundQueue;
-    private SedaQueue outboundQueue;
-    private StageController stageController;
-    private EventHandler eventHandler;
+public class Stage implements Lifecycle{
+    private final SedaQueue queue;
+    private final EventDispatcher dispatcher;
+    Stage(StageConfig config, EventHandler handler){
 
-    public Stage(){
+        //initialize the Queue.
+        queue= new SedaQueue(config.getQueueConfig());
+
+        // initialize the dispatcher
+        dispatcher= new EventDispatcher(config.getThreadPoolConfig(),handler, queue);
+
+
     }
 
-    public Stage(EventHandler evtHandler) {
-        this.eventHandler = evtHandler;
+    @Override
+    public boolean init() {
+
+        // let the dispatcher start listening to the messages on the queue.
+          return (queue.init() &&  queue.registerListener(dispatcher));
     }
 
-    public Stage(EventHandler evtHandler, StageController stageController) {
-        this.eventHandler = evtHandler;
-        this.stageController = stageController;
+    @Override
+    public void pause() {
+
     }
 
-    public void  init(){
+    @Override
+    public boolean stop() {
 
-
+        return queue.stop() && dispatcher.stop();
     }
 }
