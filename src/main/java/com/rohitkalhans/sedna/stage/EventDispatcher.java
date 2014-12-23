@@ -23,7 +23,7 @@ public class EventDispatcher implements MessageListener {
         threadPool= new ThreadPool(config);
         this.handler= handler;
         this.queue= queue;
-        OutputCollector collector= new OutputCollector(queue);
+        collector= new OutputCollector(queue);
     }
 
 

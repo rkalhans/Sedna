@@ -18,6 +18,10 @@ public class SedaQueue implements Lifecycle {
     private QueueConfig config;
     private ActiveMQConnectionFactory connectionFactory;
     private static ThreadLocal<Connection> threadConnection = new ThreadLocal<Connection>();
+    Connection connection;
+    Destination destination;
+    MessageConsumer consumer;
+    Session session;
 
     private Connection getConnection() throws JMSException{
        if(threadConnection.get() == null)
@@ -49,6 +53,11 @@ public class SedaQueue implements Lifecycle {
         try {
             brokerService.addConnector("tcp://localhost:" + config.getQueuePort());
             brokerService.start();
+            connection= connectionFactory.createConnection();
+            connection.start();
+            session= connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            destination = session.createQueue(INBOUND_QUEUE);
+            consumer = session.createConsumer(destination);
             return true;
         }
         catch (Exception ex){
@@ -98,11 +107,6 @@ public class SedaQueue implements Lifecycle {
     public boolean registerListener( MessageListener listener)
     {
         try {
-            Connection con = getConnection();
-            con.start();
-            Session session = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Destination destination = session.createQueue(OUTBOUND_QUEUE);
-            MessageConsumer consumer = session.createConsumer(destination);
             consumer.setMessageListener(listener);
         }catch (JMSException ex){
             return false;

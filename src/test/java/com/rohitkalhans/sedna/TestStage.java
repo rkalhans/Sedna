@@ -30,9 +30,9 @@ public class TestStage {
             for (int i = 0; i < 100; i++) {
                 threadpool.submit(new TestProducer());
             }
-            //Thread.sleep(10000);
-            TestConsumer.run();
 
+            new TestConsumer().run();
+            stage.stop();
         } else {
             System.err.println("Kuch phat gaya!");
         }
@@ -77,7 +77,7 @@ public class TestStage {
     }
 
     public static class TestConsumer implements ExceptionListener {
-        public static void run() {
+        public void run() {
             try {
 
                 // Create a ConnectionFactory
@@ -86,6 +86,7 @@ public class TestStage {
                 // Create a Connection
                 Connection connection = connectionFactory.createConnection();
                 connection.start();
+                connection.setExceptionListener(this);
 
 
                 // Create a Session
@@ -97,17 +98,18 @@ public class TestStage {
                 // Create a MessageConsumer from the Session to the Topic or Queue
                 MessageConsumer consumer = session.createConsumer(destination);
 
+                int i=100;
                 // Wait for a message
-                Message message = consumer.receive(1000);
-
-                if (message instanceof TextMessage) {
-                    TextMessage textMessage = (TextMessage) message;
-                    String text = textMessage.getText();
-                    System.out.println("Received: " + text);
-                } else {
-                    System.out.println("Received: " + message);
+                while( i-- > 0) {
+                    Message message = consumer.receive(1000);
+                    if (message instanceof TextMessage) {
+                        TextMessage textMessage = (TextMessage) message;
+                        String text = textMessage.getText();
+                        System.out.println("Received: " + text);
+                    } else {
+                        System.out.println("Received: " + message);
+                    }
                 }
-
                 consumer.close();
                 session.close();
                 connection.close();
@@ -119,7 +121,10 @@ public class TestStage {
 
         @Override
         public void onException(JMSException e) {
+            System.err.println("Excception"+e);
+            e.printStackTrace();
 
         }
     }
+
 }
