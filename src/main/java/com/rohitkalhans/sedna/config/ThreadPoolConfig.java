@@ -21,4 +21,6 @@ public class ThreadPoolConfig {
 
     @JsonProperty
     private int blockingQueueSize= 20;
+
+    public ThreadPoolConfig(){};
 }

@@ -12,6 +12,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class QueueConfig {
 
     @JsonProperty
-    private int queuePort;
-
+    private int queuePort=2166;
+    public QueueConfig(){}
 }

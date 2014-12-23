@@ -5,7 +5,7 @@ package com.rohitkalhans.sedna.stage;
  */
 public interface Lifecycle {
 
-    public boolean init();
+    public boolean start();
     public void pause();
     public boolean stop();
 }

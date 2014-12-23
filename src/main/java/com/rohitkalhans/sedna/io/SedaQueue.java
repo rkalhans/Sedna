@@ -12,12 +12,12 @@ import javax.jms.*;
  */
 
 public class SedaQueue implements Lifecycle {
-    private final String INBOUND_QUEUE= "SEDNA_IN";
-    private final String OUTBOUND_QUEUE= "SEDNA_OUT";
+    public static final String INBOUND_QUEUE= "SEDNA_IN";
+    public static final String OUTBOUND_QUEUE= "SEDNA_OUT";
     private BrokerService brokerService;
     private QueueConfig config;
     private ActiveMQConnectionFactory connectionFactory;
-    private ThreadLocal<Connection> threadConnection;
+    private static ThreadLocal<Connection> threadConnection = new ThreadLocal<Connection>();
 
     private Connection getConnection() throws JMSException{
        if(threadConnection.get() == null)
@@ -36,7 +36,7 @@ public class SedaQueue implements Lifecycle {
         // of this software), I now pronounce ActiveMQ DEFAULT QUEUE for SEDNA
         // you may now initialize the broker"
 
-        BrokerService broker = new BrokerService();
+       brokerService = new BrokerService();
 
         // ------- Somewhere in the deep dark corner of his house the sobs of ZeroMQ was heard by a few ---------
 
@@ -45,13 +45,15 @@ public class SedaQueue implements Lifecycle {
 
 
     @Override
-    public boolean init(){
+    public boolean start(){
         try {
             brokerService.addConnector("tcp://localhost:" + config.getQueuePort());
             brokerService.start();
             return true;
         }
         catch (Exception ex){
+            System.err.println(ex.getMessage());
+            ex.printStackTrace();
             return false;
         }
     }
@@ -73,20 +75,20 @@ public class SedaQueue implements Lifecycle {
         }
     }
 
-    public void writeOut(Message message) throws JMSException
+    public void writeOut(String message) throws JMSException
     {
         writeOut(message,null);
     }
 
 
-    public void  writeOut(Message message, String OutboundQueue) throws JMSException {
+    public void  writeOut(String message, String OutboundQueue) throws JMSException {
         Connection con = getConnection();
         con.start();
         Session session = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Destination destination = session.createQueue((OutboundQueue== null)?OUTBOUND_QUEUE:OutboundQueue);
         MessageProducer producer = session.createProducer(destination);
         producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-        producer.send(destination,message);
+        producer.send(destination,session.createTextMessage(message));
         session.close();
         //con.stop();
     }

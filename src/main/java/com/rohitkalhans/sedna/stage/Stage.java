@@ -26,7 +26,7 @@ import lombok.Setter;
 public class Stage implements Lifecycle{
     private final SedaQueue queue;
     private final EventDispatcher dispatcher;
-    Stage(StageConfig config, EventHandler handler){
+    public Stage(StageConfig config, EventHandler handler){
 
         //initialize the Queue.
         queue= new SedaQueue(config.getQueueConfig());
@@ -34,14 +34,13 @@ public class Stage implements Lifecycle{
         // initialize the dispatcher
         dispatcher= new EventDispatcher(config.getThreadPoolConfig(),handler, queue);
 
-
     }
 
     @Override
-    public boolean init() {
+    public boolean start() {
 
         // let the dispatcher start listening to the messages on the queue.
-          return (queue.init() &&  queue.registerListener(dispatcher));
+          return (queue.start() &&  queue.registerListener(dispatcher));
     }
 
     @Override
