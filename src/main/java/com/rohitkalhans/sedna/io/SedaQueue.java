@@ -11,27 +11,40 @@ import javax.jms.*;
  * Created by rohit.kalhans on 21/12/14.
  */
 
+/**
+ * Abstraction of ActiveMQ which will be used as input and output queues.
+ * The inbound and the outbound queues will be used by default unless the
+ * output is directed to a different queues as specified in the OutputCollector.write().
+ */
+
 public class SedaQueue implements Lifecycle {
-    public static final String INBOUND_QUEUE= "SEDNA_IN";
-    public static final String OUTBOUND_QUEUE= "SEDNA_OUT";
-    private BrokerService brokerService;
-    private QueueConfig config;
-    private ActiveMQConnectionFactory connectionFactory;
+
+    /* inbound queue will be named SEDNA_IN by default */
+    public static final String INBOUND_QUEUE = "SEDNA_IN";
+
+    /* Outbound queue will be named SEDNA_OUT by default. */
+    public static final String OUTBOUND_QUEUE = "SEDNA_OUT";
+    /* threadlocal connection to the the ActiveMQ */
     private static ThreadLocal<Connection> threadConnection = new ThreadLocal<Connection>();
     Connection connection;
     Destination destination;
     MessageConsumer consumer;
     Session session;
+    /* instance of ActiveMQ Broker Service */
+    private BrokerService brokerService;
+    /* Config that will be required to instantiate the queue. */
+    private QueueConfig config;
+    /* Active MQ connection factory. */
+    private ActiveMQConnectionFactory connectionFactory;
 
-    private Connection getConnection() throws JMSException{
-       if(threadConnection.get() == null)
-           threadConnection.set(connectionFactory.createConnection());
-        return threadConnection.get();
-    }
+    /**
+     * Constructor to initaialize a queue
+     *
+     * @param config
+     */
 
-
-    public SedaQueue(QueueConfig config){
-        this.config= config;
+    public SedaQueue(QueueConfig config) {
+        this.config = config;
 
         // "By default we will use Active MQ All those who wish
         // to oppose this must speak now or must hold their
@@ -39,31 +52,43 @@ public class SedaQueue implements Lifecycle {
         // No one spoke. Good! By the power vested in me (as the programmer
         // of this software), I now pronounce ActiveMQ DEFAULT QUEUE for SEDNA
         // you may now initialize the broker"
-
-       brokerService = new BrokerService();
+        brokerService = new BrokerService();
 
         // ------- Somewhere in the deep dark corner of his house the sobs of ZeroMQ was heard by a few ---------
 
         connectionFactory = new ActiveMQConnectionFactory("vm://localhost");
     }
 
+    /**
+     * @return connection that will be used by this thread.
+     * @throws JMSException When it is unable to create a connection
+     *                      to ActiveMQ
+     */
+
+    private Connection getConnection() throws JMSException {
+        if (threadConnection.get() == null)
+            threadConnection.set(connectionFactory.createConnection());
+        return threadConnection.get();
+    }
+
+    /**
+     * Starts the queue. Initialize the brokerservice with a TCP connector.
+     * Creates a session and creates a new consumer.
+     */
 
     @Override
-    public boolean start(){
+    public void start() {
         try {
             brokerService.addConnector("tcp://localhost:" + config.getQueuePort());
             brokerService.start();
-            connection= connectionFactory.createConnection();
+            connection = connectionFactory.createConnection();
             connection.start();
-            session= connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             destination = session.createQueue(INBOUND_QUEUE);
             consumer = session.createConsumer(destination);
-            return true;
-        }
-        catch (Exception ex){
+        } catch (Exception ex) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
-            return false;
         }
     }
 
@@ -73,47 +98,63 @@ public class SedaQueue implements Lifecycle {
 
     }
 
+    /**
+     * Stop the broker.
+     */
     @Override
-    public boolean stop() {
+    public void stop() {
         try {
             brokerService.stop();
-            return true;
-        }
-        catch(Exception ex) {
-            return false;
+        } catch (Exception ex) {
+
         }
     }
 
-    public void writeOut(String message) throws JMSException
-    {
-        writeOut(message,null);
+    /**
+     * Write to the output queue. Writes to default queue.
+     *
+     * @param message
+     * @throws JMSException when it is unable to write to the output queue.
+     */
+    public void writeOut(String message) throws JMSException {
+        writeOut(message, null);
     }
 
+    /**
+     * Writes to the output queue specified by the writer.
+     *
+     * @param message
+     * @param OutboundQueue
+     * @throws JMSException when it is unable to write to the output queue.
+     */
 
-    public void  writeOut(String message, String OutboundQueue) throws JMSException {
+    public void writeOut(String message, String OutboundQueue) throws JMSException {
         Connection con = getConnection();
         con.start();
         Session session = con.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Destination destination = session.createQueue((OutboundQueue== null)?OUTBOUND_QUEUE:OutboundQueue);
+        Destination destination = session.createQueue((OutboundQueue == null) ? OUTBOUND_QUEUE : OutboundQueue);
         MessageProducer producer = session.createProducer(destination);
         producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-        producer.send(destination,session.createTextMessage(message));
+        producer.send(destination, session.createTextMessage(message));
         session.close();
         //con.stop();
     }
 
+    /**
+     * Register a message listener to this queue.  The message listener's onMessage()
+     * will be called every time an event is seen.
+     *
+     * @param listener
+     * @return
+     */
 
-    // todo: fix this  method since this not the correct way of adding a message listener.
-    public boolean registerListener( MessageListener listener)
-    {
+    public boolean registerListener(MessageListener listener) {
         try {
             consumer.setMessageListener(listener);
-        }catch (JMSException ex){
+        } catch (JMSException ex) {
             return false;
         }
         return true;
     }
-
-    //todo: figure out how to unregister a dispacher.
 
 }

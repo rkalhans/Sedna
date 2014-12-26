@@ -1,6 +1,7 @@
 package com.rohitkalhans.sedna.stage;
 
 import com.rohitkalhans.sedna.config.StageConfig;
+import com.rohitkalhans.sedna.controllers.EventHandler;
 import com.rohitkalhans.sedna.io.SedaQueue;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Stage implements Lifecycle{
+    private String name;
     private final SedaQueue queue;
     private final EventDispatcher dispatcher;
     public Stage(StageConfig config, EventHandler handler){
@@ -36,21 +38,40 @@ public class Stage implements Lifecycle{
 
     }
 
+    /**
+     * Start a stage. It has two basic functionality,
+     * 1. Start the Queue
+     * 2. Register the dispacher with this queue.
+     * Irrespective to weather the Queue was started by the this stage or any other,
+     * the dispatcher will be registered to the source queue.
+     */
+
     @Override
-    public boolean start() {
+    public void start() {
 
         // let the dispatcher start listening to the messages on the queue.
-          return (queue.start() &&  queue.registerListener(dispatcher));
+        queue.start();
+        queue.registerListener(dispatcher);
     }
 
+    /**
+     * No-op as of now. We should be able to pause the stage at a safe point.
+     * By safe point I mean when all the scheduled events have been processed and we
+     * have safely stored (persisted) the current state, so that it is not volatile.
+     */
     @Override
     public void pause() {
 
     }
 
-    @Override
-    public boolean stop() {
+    /**
+     * Stops the stage. The queue is stopped and the dispatcher is stopped and the
+     * dispatcher's threadpool is shutdown.
+     */
 
-        return queue.stop() && dispatcher.stop();
+    @Override
+    public void stop() {
+        queue.stop();
+        dispatcher.stop();
     }
 }

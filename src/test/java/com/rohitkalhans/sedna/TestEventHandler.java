@@ -1,7 +1,7 @@
 package com.rohitkalhans.sedna;
 
 import com.rohitkalhans.sedna.io.OutputCollector;
-import com.rohitkalhans.sedna.stage.EventHandler;
+import com.rohitkalhans.sedna.controllers.EventHandler;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
