@@ -1,6 +1,7 @@
 package com.rohitkalhans.sedna.config;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
@@ -11,6 +12,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * Config to handle to the Queue.
  */
 @AllArgsConstructor
+@Getter
 public class QueueConfig {
 
     /* The port on which the ActiveMQ broker will be started. */

@@ -4,6 +4,7 @@ import com.rohitkalhans.sedna.config.StageConfig;
 import com.rohitkalhans.sedna.controllers.EventHandler;
 import com.rohitkalhans.sedna.io.SedaQueue;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * This is the first prototype towards creating a new SEDA based wire-frame which
@@ -22,6 +23,7 @@ import lombok.Getter;
  * handler which will hold the event processing logic.
  */
 @Getter
+@Setter
 public class Stage implements Lifecycle {
     private final SedaQueue queue;
     private final EventDispatcher dispatcher;
@@ -74,7 +76,4 @@ public class Stage implements Lifecycle {
         dispatcher.stop();
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 }

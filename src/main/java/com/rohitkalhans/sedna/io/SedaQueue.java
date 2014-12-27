@@ -40,7 +40,7 @@ public class SedaQueue implements Lifecycle {
     /**
      * Constructor to initaialize a queue
      *
-     * @param config
+     * @param config Queue Config object.
      */
 
     public SedaQueue(QueueConfig config) {

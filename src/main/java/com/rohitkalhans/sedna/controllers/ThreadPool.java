@@ -1,6 +1,7 @@
 package com.rohitkalhans.sedna.controllers;
 
 import com.rohitkalhans.sedna.config.ThreadPoolConfig;
+import lombok.Getter;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -14,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Abstraction of thread-pool on top of flexible threadpool
  */
+@Getter
 public class ThreadPool {
 
     /* The thread pool */
