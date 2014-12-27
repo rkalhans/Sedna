@@ -3,8 +3,6 @@ package com.rohitkalhans.sedna.stage;
 import com.rohitkalhans.sedna.config.StageConfig;
 import com.rohitkalhans.sedna.controllers.EventHandler;
 import com.rohitkalhans.sedna.io.SedaQueue;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * This is the first prototype towards creating a new SEDA based wire-frame which
@@ -22,26 +20,25 @@ import lombok.Setter;
  * and to minimize the latency.) The final and the most essential part of any stage is the event
  * handler which will hold the event processing logic.
  */
-@Getter
-@Setter
-public class Stage implements Lifecycle{
-    private String name;
+public class Stage implements Lifecycle {
     private final SedaQueue queue;
     private final EventDispatcher dispatcher;
-    public Stage(StageConfig config, EventHandler handler){
+    private String name;
+
+    public Stage(StageConfig config, EventHandler handler) {
 
         //initialize the Queue.
-        queue= new SedaQueue(config.getQueueConfig());
+        queue = new SedaQueue(config.getQueueConfig());
 
         // initialize the dispatcher
-        dispatcher= new EventDispatcher(config.getThreadPoolConfig(),handler, queue);
+        dispatcher = new EventDispatcher(config.getThreadPoolConfig(), handler, queue);
 
     }
 
     /**
      * Start a stage. It has two basic functionality,
      * 1. Start the Queue
-     * 2. Register the dispacher with this queue.
+     * 2. Register the dispatcher with this queue.
      * Irrespective to weather the Queue was started by the this stage or any other,
      * the dispatcher will be registered to the source queue.
      */
@@ -73,5 +70,21 @@ public class Stage implements Lifecycle{
     public void stop() {
         queue.stop();
         dispatcher.stop();
+    }
+
+    public SedaQueue getQueue() {
+        return this.queue;
+    }
+
+    public EventDispatcher getDispatcher() {
+        return this.dispatcher;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -15,7 +15,7 @@ public interface EventHandler {
     /**
      * This method should be overridden with the custom logic of handling the event.
      *
-     * @param event Event that needs to be handled.
+     * @param event     Event that needs to be handled.
      * @param collector Output collector which can be used to write to the output queue.
      */
     public abstract void executeEvent(Message event, OutputCollector collector);

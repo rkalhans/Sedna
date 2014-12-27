@@ -1,10 +1,10 @@
 package com.rohitkalhans.sedna.stage;
 
-import com.rohitkalhans.sedna.controllers.EventHandler;
-import com.rohitkalhans.sedna.io.OutputCollector;
-import com.rohitkalhans.sedna.controllers.EventHandlerTask;
 import com.rohitkalhans.sedna.config.ThreadPoolConfig;
+import com.rohitkalhans.sedna.controllers.EventHandler;
+import com.rohitkalhans.sedna.controllers.EventHandlerTask;
 import com.rohitkalhans.sedna.controllers.ThreadPool;
+import com.rohitkalhans.sedna.io.OutputCollector;
 import com.rohitkalhans.sedna.io.SedaQueue;
 
 import javax.jms.Message;
@@ -36,21 +36,22 @@ public class EventDispatcher implements MessageListener {
 
     /**
      * Constructor to initialize the event dispatcher.
-     * @param config Config of the thread pool.
+     *
+     * @param config  Config of the thread pool.
      * @param handler Event handler logic. Should ideally be provided while initializing the Stage.
-     * @param queue The Source and the output queue. We will be using ActiveMQ which should have saperate virtual queues for
-     *              input and output handling. see @link SedaQueue for more details.
+     * @param queue   The Source and the output queue. We will be using ActiveMQ which should have saperate virtual queues for
+     *                input and output handling. see @link SedaQueue for more details.
      */
-    EventDispatcher(ThreadPoolConfig config, EventHandler handler, SedaQueue queue)
-    {
-        threadPool= new ThreadPool(config);
-        this.handler= handler;
-        this.queue= queue;
-        collector= new OutputCollector(queue);
+    EventDispatcher(ThreadPoolConfig config, EventHandler handler, SedaQueue queue) {
+        threadPool = new ThreadPool(config);
+        this.handler = handler;
+        this.queue = queue;
+        collector = new OutputCollector(queue);
     }
 
     /**
      * The callback function that is called when an event is received by the input queue.
+     *
      * @param message The event will be passed to this method as Jmx message.
      */
 
@@ -58,12 +59,12 @@ public class EventDispatcher implements MessageListener {
     public void onMessage(Message message) {
         threadPool.submit(new EventHandlerTask(message, handler, collector));
     }
+
     /**
      * Stops the Dispatcher. The threadpool will be shutdown.
      */
 
-    public boolean  stop()
-    {
+    public boolean stop() {
         threadPool.shutdown();
         return true;
     }

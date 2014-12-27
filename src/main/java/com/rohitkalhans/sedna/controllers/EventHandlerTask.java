@@ -23,6 +23,7 @@ public class EventHandlerTask implements Runnable {
 
     /**
      * Constructor of the eventHandler.
+     *
      * @param evt
      * @param handler
      * @param collector

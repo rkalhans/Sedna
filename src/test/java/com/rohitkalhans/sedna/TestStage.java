@@ -25,16 +25,18 @@ public class TestStage {
             new ArrayBlockingQueue<Runnable>(100));
 
     public static void main(String[] args) throws InterruptedException {
-        Stage stage = new Stage(new StageConfig(new QueueConfig(), new ThreadPoolConfig()), new TestEventHandler());
-        if (stage.start()) {
+        Stage stage = new Stage(new StageConfig(new ThreadPoolConfig(), new QueueConfig()), new TestEventHandler());
+        try {
+            stage.start();
             for (int i = 0; i < 100; i++) {
                 threadpool.submit(new TestProducer());
             }
-
+            threadpool.shutdown();
             new TestConsumer().run();
             stage.stop();
-        } else {
-            System.err.println("Kuch phat gaya!");
+
+        } catch (Exception ex) {
+            System.out.println("Kuch fat gaya " + ex.getMessage());
         }
     }
 
@@ -63,7 +65,7 @@ public class TestStage {
                 TextMessage message = session.createTextMessage(text);
 
                 // Tell the producer to send the message
-                 System.out.println("Sent message: "+ message.hashCode() + " : " + Thread.currentThread().getName());
+                System.out.println("Sent message: " + message.hashCode() + " : " + Thread.currentThread().getName());
                 producer.send(message);
 
                 // Clean up
@@ -98,9 +100,9 @@ public class TestStage {
                 // Create a MessageConsumer from the Session to the Topic or Queue
                 MessageConsumer consumer = session.createConsumer(destination);
 
-                int i=100;
+                int i = 100;
                 // Wait for a message
-                while( i-- > 0) {
+                while (i-- > 0) {
                     Message message = consumer.receive(1000);
                     if (message instanceof TextMessage) {
                         TextMessage textMessage = (TextMessage) message;
@@ -121,7 +123,7 @@ public class TestStage {
 
         @Override
         public void onException(JMSException e) {
-            System.err.println("Excception"+e);
+            System.err.println("Excception" + e);
             e.printStackTrace();
 
         }
