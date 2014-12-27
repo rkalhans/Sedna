@@ -3,6 +3,7 @@ package com.rohitkalhans.sedna.stage;
 import com.rohitkalhans.sedna.config.StageConfig;
 import com.rohitkalhans.sedna.controllers.EventHandler;
 import com.rohitkalhans.sedna.io.SedaQueue;
+import lombok.Getter;
 
 /**
  * This is the first prototype towards creating a new SEDA based wire-frame which
@@ -20,6 +21,7 @@ import com.rohitkalhans.sedna.io.SedaQueue;
  * and to minimize the latency.) The final and the most essential part of any stage is the event
  * handler which will hold the event processing logic.
  */
+@Getter
 public class Stage implements Lifecycle {
     private final SedaQueue queue;
     private final EventDispatcher dispatcher;
@@ -70,18 +72,6 @@ public class Stage implements Lifecycle {
     public void stop() {
         queue.stop();
         dispatcher.stop();
-    }
-
-    public SedaQueue getQueue() {
-        return this.queue;
-    }
-
-    public EventDispatcher getDispatcher() {
-        return this.dispatcher;
-    }
-
-    public String getName() {
-        return this.name;
     }
 
     public void setName(String name) {

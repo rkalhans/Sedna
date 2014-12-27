@@ -1,5 +1,7 @@
 package com.rohitkalhans.sedna.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
@@ -9,6 +11,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 /**
  * Config for a given stage
  */
+@Getter
+@AllArgsConstructor
 public class StageConfig {
 
     /* host on which the stage is deployed. */
@@ -33,32 +37,4 @@ public class StageConfig {
         this.queueConfig = queueConfig;
     }
 
-    @java.beans.ConstructorProperties({"host", "sourceStage", "name", "queueConfig", "threadPoolConfig"})
-    public StageConfig(String host, String sourceStage, String name, QueueConfig queueConfig, ThreadPoolConfig threadPoolConfig) {
-        this.host = host;
-        this.sourceStage = sourceStage;
-        this.name = name;
-        this.queueConfig = queueConfig;
-        this.threadPoolConfig = threadPoolConfig;
-    }
-
-    public String getHost() {
-        return this.host;
-    }
-
-    public String getSourceStage() {
-        return this.sourceStage;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public QueueConfig getQueueConfig() {
-        return this.queueConfig;
-    }
-
-    public ThreadPoolConfig getThreadPoolConfig() {
-        return this.threadPoolConfig;
-    }
 }

@@ -1,5 +1,6 @@
 package com.rohitkalhans.sedna.config;
 
+import lombok.AllArgsConstructor;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
@@ -9,6 +10,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 /**
  * Config to handle to the Queue.
  */
+@AllArgsConstructor
 public class QueueConfig {
 
     /* The port on which the ActiveMQ broker will be started. */
@@ -19,11 +21,6 @@ public class QueueConfig {
      * default constructor.
      */
     public QueueConfig() {
-    }
-
-    @java.beans.ConstructorProperties({"queuePort"})
-    public QueueConfig(int queuePort) {
-        this.queuePort = queuePort;
     }
 
     public int getQueuePort() {
