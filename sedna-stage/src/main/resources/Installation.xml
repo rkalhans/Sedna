@@ -1,0 +1,36 @@
+<stages>
+    <stage>
+        <host>localhost</host>
+        <name>IngestionStage</name>
+        <eventHandler>com.rohitkalhans.sedna.test.TestEventHandler</eventHandler>
+        <sourceStage></sourceStage>
+        <destination>
+            <type>Active-MQ</type>
+            <port>2822</port>
+            <queue>ingestionStage-out</queue>
+        </destination>
+        <threadpool>
+            <coreSize>20</coreSize>
+            <maxSize>50</maxSize>
+            <idleTimeOut>60</idleTimeOut>
+            <blockingQueueSize>100</blockingQueueSize>
+        </threadpool>
+    </stage>
+    <stage>
+        <host>localhost</host>
+        <name>IngestionReplica</name>
+        <eventHandler>com.rohitkalhans.sedna.test.TestEventHandler</eventHandler>
+        <sourceStage>IngestionStage</sourceStage>
+        <destination>
+            <type>Active-MQ</type>
+            <port>2823</port>
+            <queue>ingestionStage-out</queue>
+        </destination>
+        <threadpool>
+            <coreSize>20</coreSize>
+            <maxSize>50</maxSize>
+            <idleTimeOut>60</idleTimeOut>
+            <blockingQueueSize>100</blockingQueueSize>
+        </threadpool>
+    </stage>
+</stages>
