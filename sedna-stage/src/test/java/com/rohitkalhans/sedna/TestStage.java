@@ -47,7 +47,8 @@ public class TestStage {
         public void run() {
             try {
                 // Create a ConnectionFactory
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("nio://127.0.0.1:2265");
+                ActiveMQConnectionFactory connectionFactory =
+                        new ActiveMQConnectionFactory("nio://localhost:2166");
 
                 // Create a Connection
                 Connection connection = connectionFactory.createConnection();
@@ -65,8 +66,8 @@ public class TestStage {
 
                 // Create a messages
                 for(int i= 0; i<totalMessages; i++) {
-                   // Thread.sleep(10);
-                    String text = randomNumber(40,60)+","+randomNumber(60,80)+","+randomNumber(50,70);
+                    Thread.sleep(20);
+                    String text = randomNumber(40,60)+","+randomNumber(120,190)+","+randomNumber(50,70);
                     TextMessage message = session.createTextMessage(text);
                     // Tell the producer to send the message
                     System.out.println("Sent message: " +text);
@@ -92,7 +93,8 @@ public class TestStage {
             try {
 
                 // Create a ConnectionFactory
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("nio://127.0.0.1:2265");
+                ActiveMQConnectionFactory connectionFactory =
+                        new ActiveMQConnectionFactory("nio://localhost:2166");
 
                 // Create a Connection
                 Connection connection = connectionFactory.createConnection();

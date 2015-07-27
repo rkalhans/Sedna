@@ -1,10 +1,12 @@
 package com.rohitkalhans.sedna.manage.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rohitkalhans.sedna.manage.exceptions.SednaException;
 import com.rohitkalhans.sedna.manage.payloads.JVMOpts;
 import com.rohitkalhans.sedna.manage.payloads.StageConfig;
 import com.rohitkalhans.sedna.manage.server.ManagementConfig;
 import com.rohitkalhans.sedna.manage.util.FSUtils;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -16,13 +18,19 @@ import java.util.UUID;
  * Created by rkalhans on 19-07-2015.
  */
 @Slf4j
+@Getter
 public class Slot {
 
+    @JsonProperty
     private JVMOpts JVMSixe;
-    String id;
-    Process stageProcess;
-    StageConfig stageConfig;
-    ManagementConfig config;
+    @JsonProperty
+    private String id;
+
+    private Process stageProcess;
+    @JsonProperty
+    private StageConfig stageConfig;
+    @JsonProperty
+    private ManagementConfig config;
 
     public Slot(JVMOpts JVMSize, StageConfig stageConfig, ManagementConfig config){
         this.JVMSixe = JVMSize;
@@ -81,6 +89,7 @@ public class Slot {
     public Process switchSlot(StageConfig config) throws IOException
     {
         stopSlot();
+        this.stageConfig = config;
         return createStage();
     }
 }

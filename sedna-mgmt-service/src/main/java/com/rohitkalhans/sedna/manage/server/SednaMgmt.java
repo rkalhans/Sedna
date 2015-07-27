@@ -13,6 +13,7 @@ public class SednaMgmt extends Application<ManagementConfig> {
 
     public static void main(String[] args) throws Exception {
         new SednaMgmt().run(args);
+
     }
 
     @Override

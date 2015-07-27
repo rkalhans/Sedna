@@ -1,2 +1,9 @@
-stageJarPath: "C:\\Users\\rkalhans\\sources\\Sedna\\sedna-stage\\target\\sedna-stage-1.0-SNAPSHOT.jar"
+stageJarPath: "F:\\hackathon\\Sedna\\sedna-stage\\target\\sedna-stage-1.0-SNAPSHOT.jar"
 workingDir: "C:\\tmp\\log"
+server:
+  applicationConnectors:
+  - type: http 
+    port: 9000
+  adminConnectors:
+  - type: http
+    port: 9001

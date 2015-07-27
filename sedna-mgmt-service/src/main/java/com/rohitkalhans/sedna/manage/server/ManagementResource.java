@@ -7,10 +7,7 @@ import com.rohitkalhans.sedna.manage.payloads.JVMOpts;
 import com.rohitkalhans.sedna.manage.payloads.StageConfig;
 import com.rohitkalhans.sedna.manage.payloads.SuccessResponse;
 
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -48,5 +45,14 @@ public class ManagementResource {
             throw new SednaException("No host configured on this machine. use buildHost endpoint first.", npe);
         }
         return SuccessResponse.from(config);
+    }
+
+    @POST
+    @Timed
+    @Path("/switchSlot")
+    public SuccessResponse switchSlot(@QueryParam("victim")String victim, StageConfig newStageConfig)
+    {
+        host.switchSlot(victim,newStageConfig);
+         return SuccessResponse.from(newStageConfig);
     }
 }
