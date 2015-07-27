@@ -1,5 +1,6 @@
 package com.rohitkalhans.sedna.manage.controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rohitkalhans.sedna.manage.exceptions.SednaException;
 import com.rohitkalhans.sedna.manage.payloads.JVMOpts;
@@ -22,20 +23,23 @@ import java.util.UUID;
 public class Slot {
 
     @JsonProperty
-    private JVMOpts JVMSixe;
+    private JVMOpts jvmSize;
     @JsonProperty
     private String id;
 
+    @JsonIgnore
     private Process stageProcess;
+
     @JsonProperty
     private StageConfig stageConfig;
     @JsonProperty
     private ManagementConfig config;
 
     public Slot(JVMOpts JVMSize, StageConfig stageConfig, ManagementConfig config){
-        this.JVMSixe = JVMSize;
+        this.jvmSize = JVMSize;
         this.stageConfig = stageConfig;
         this.config = config;
+        this.id = UUID.randomUUID().toString();
         try {
             createStage();
         } catch (IOException e) {
@@ -47,11 +51,11 @@ public class Slot {
     {
         String configFile = this.config.getWorkingDir()+
                 File.separator+
-                stageConfig.getName()+"-config.json";
+                stageConfig.getName()+"-config-"+id+".json";
         FSUtils.writeConfig(stageConfig, new File(configFile));
         log.info("Wrote config file at " + configFile);
         ProcessBuilder builder = new ProcessBuilder(FSUtils.getJavaExecutablePath(),
-                "-Xmx"+ JVMSixe.getMaxHeap(),
+                "-Xmx"+ jvmSize.getMaxHeap(),
                 "-jar",
                 this.config.getStageJarPath(),
                 configFile,
@@ -59,7 +63,8 @@ public class Slot {
         Map<String, String> env = builder.environment();
         File workingDir = FSUtils.createTempDirectory(this.config.getWorkingDir());
         builder.directory(workingDir);
-        File logFile = new File(this.config.getWorkingDir(), "log-"+stageConfig.getName());
+        File logFile = new File(this.config.getWorkingDir(),
+                stageConfig.getName()+"-"+id+".log");
         log.info("Writing Log to " + logFile.getAbsolutePath());
         builder.redirectErrorStream(true);
         builder.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));
@@ -67,12 +72,13 @@ public class Slot {
         assert builder.redirectInput() == ProcessBuilder.Redirect.PIPE;
         assert builder.redirectOutput().file() == log;
         assert p.getInputStream().read() == -1;
-        this.id = UUID.randomUUID().toString();
         this.stageProcess = p;
         return p;
     }
 
     public Process startSlot() throws IOException{
+        log.info("Creating new Stage NAME:"+stageConfig.getName());
+        log.debug("NewStage Config"+FSUtils.getConfig(stageConfig));
         return createStage();
     }
      public void stopSlot(){
@@ -88,8 +94,10 @@ public class Slot {
 
     public Process switchSlot(StageConfig config) throws IOException
     {
+        log.info("Switcing Stage "+stageConfig.getName()+" with "+config.getName());
         stopSlot();
         this.stageConfig = config;
+        log.debug("NewStage Config "+ FSUtils.getConfig(config));
         return createStage();
     }
 }

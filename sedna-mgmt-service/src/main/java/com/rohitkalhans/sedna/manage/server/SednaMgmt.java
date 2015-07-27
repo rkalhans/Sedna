@@ -18,7 +18,6 @@ public class SednaMgmt extends Application<ManagementConfig> {
 
     @Override
     public void initialize(Bootstrap<ManagementConfig> bootstrap) {
-
     }
 
     @Override

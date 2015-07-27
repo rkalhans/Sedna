@@ -1,5 +1,6 @@
 package com.rohitkalhans.sedna.manage.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rohitkalhans.sedna.manage.payloads.Payload;
 
@@ -41,5 +42,16 @@ public class FSUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static String getConfig(Payload payload)
+    {
+        ObjectMapper mapper = new ObjectMapper();
+        try{
+            return mapper.writeValueAsString(payload);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -1,5 +1,7 @@
 package com.rohitkalhans.sedna.manage.controller;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rohitkalhans.sedna.manage.exceptions.SednaException;
 import com.rohitkalhans.sedna.manage.payloads.JVMOpts;
 import com.rohitkalhans.sedna.manage.payloads.StageConfig;
@@ -19,42 +21,47 @@ import java.util.TreeMap;
 public class Host {
 
 
-    private JVMOpts JVMSize;
+    @JsonProperty
+    private JVMOpts jvmSize;
 
+    @JsonProperty
     private int numSlots;
 
+    @JsonProperty
     private Map<String, ArrayList<Slot>> stageMap= new TreeMap<>();
 
-    int size =0 ;
+    @JsonProperty
+    int usedSlots = 0 ;
 
+    @JsonIgnore
     ManagementConfig managementConfig;
 
 
     public Host(JVMOpts JVMSize, int numSlots,
                  ManagementConfig managementConfig){
         this.managementConfig = managementConfig;
-        this.JVMSize = JVMSize;
+        this.jvmSize = JVMSize;
         this.numSlots = numSlots;
     }
 
     public void addSlot(StageConfig stageConfig)
     {
-        if(size > numSlots)
+        if(usedSlots == numSlots)
             throw new SednaException("Max slots limit reached on this host.");
         addSlotHelper(stageConfig);
-        size++;
+        usedSlots++;
     }
 
     private void addSlotHelper(StageConfig stageConfig)
     {
         if(stageMap.containsKey(stageConfig.getName())) {
             stageMap.get(stageConfig.getName())
-                    .add(new Slot(JVMSize, stageConfig, managementConfig));
+                    .add(new Slot(jvmSize, stageConfig, managementConfig));
 
         }
         else {
             ArrayList<Slot> arList= new ArrayList<>();
-            arList.add(new Slot(JVMSize, stageConfig, managementConfig));
+            arList.add(new Slot(jvmSize, stageConfig, managementConfig));
             stageMap.put(stageConfig.getName(),arList);
         }
     }
@@ -85,6 +92,4 @@ public class Host {
             addSlotHelper(newStage);
         }
     }
-
-
 }

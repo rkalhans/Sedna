@@ -1,6 +1,8 @@
 package com.rohitkalhans.sedna.manage.server;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rohitkalhans.sedna.manage.controller.Host;
 import com.rohitkalhans.sedna.manage.exceptions.SednaException;
 import com.rohitkalhans.sedna.manage.payloads.JVMOpts;
@@ -18,7 +20,7 @@ import javax.ws.rs.core.MediaType;
 public class ManagementResource {
 
     private ManagementConfig config;
-    private Host host;
+    public static Host host;
     ManagementResource(ManagementConfig config){
         this.config = config;
     }
@@ -55,4 +57,13 @@ public class ManagementResource {
         host.switchSlot(victim,newStageConfig);
          return SuccessResponse.from(newStageConfig);
     }
+
+    @GET
+    @Timed
+    @Path("/hostStatus")
+    public Host getStatus() throws JsonProcessingException {
+        String hostJson = new ObjectMapper().writeValueAsString(host);
+        return host;
+    }
+
 }
