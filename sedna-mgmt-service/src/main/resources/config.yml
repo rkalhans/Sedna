@@ -1,4 +1,4 @@
-stageJarPath: "F:\\hackathon\\Sedna\\sedna-stage\\target\\sedna-stage-1.0-SNAPSHOT.jar"
+stageJarPath: "C:\\Users\\rkalhans\\sources\\Sedna\\sedna-stage\\target\\sedna-stage-1.0-SNAPSHOT.jar"
 workingDir: "C:\\tmp\\log"
 server:
   applicationConnectors:

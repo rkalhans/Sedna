@@ -7,6 +7,7 @@ import com.rohitkalhans.sedna.manage.payloads.QueueStats;
 import com.rohitkalhans.sedna.manage.payloads.StageConfig;
 import com.rohitkalhans.sedna.manage.util.Constants;
 import com.rohitkalhans.sedna.monitor.QueueResource;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.management.*;
 import javax.management.remote.JMXConnector;
@@ -25,6 +26,7 @@ import java.util.List;
 /**
  * Created by ajes on 7/28/2015.
  */
+@Slf4j
 public class ElasticResourceManager implements Runnable {
     private JMXServiceURL url;
     private JMXConnector jmxConnector;
@@ -66,7 +68,7 @@ public class ElasticResourceManager implements Runnable {
         ManagementResource.host.queueStatsMap.put("crawl_in", new QueueStats());
         ManagementResource.host.queueStatsMap.put("crawlToParse", new QueueStats());
         ManagementResource.host.queueStatsMap.put("parseToFeed", new QueueStats());
-
+        ManagementResource.host.queueStatsMap.put("feed_out", new QueueStats());
     }
 
     ElasticResourceManager() {
@@ -81,10 +83,11 @@ public class ElasticResourceManager implements Runnable {
     public void run() {
 
         try {
-            Thread.sleep(120000);
+            Thread.sleep(60000);
         } catch (InterruptedException e) {
            // e.printStackTrace();
         }
+        log.info("Monitoring agent started");
         while (jmxConnector == null) {
             try {
 
@@ -93,7 +96,7 @@ public class ElasticResourceManager implements Runnable {
                 jmxConnector = JMXConnectorFactory.connect(url);
 
                 mBeanServerConnection = jmxConnector.getMBeanServerConnection();
-                queueSizeThreshold = 10L;
+                queueSizeThreshold = 10000L;
                 initQueueResource();
 
             } catch (MalformedURLException e) {
@@ -102,7 +105,7 @@ public class ElasticResourceManager implements Runnable {
                // e.printStackTrace();
             }
         }
-
+        boolean shouldSleep= false;
         while (true) {
             try {
                 long queueSize = -1;
@@ -140,18 +143,22 @@ public class ElasticResourceManager implements Runnable {
                         os.close();
 
                         if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                            BufferedReader br = new BufferedReader(new InputStreamReader(
-                                    (conn.getInputStream())));
-
-                            String output;
-                            System.out.println("Output from Server .... \n");
-                            while ((output = br.readLine()) != null) {
-                                System.out.println(output);
-                            }
+                            // ignore
+                        }
+                        else{
+                            shouldSleep = true;
                         }
                     }
                 }
-                Thread.sleep(2000);
+                ObjectName objectNameRequest = new ObjectName(
+                        "org.apache.activemq:BrokerName=localhost,Type=Queue,Destination=feed_out");
+                queueSize = (Long) mBeanServerConnection.getAttribute(objectNameRequest, "QueueSize");
+                dispatched = (Long) mBeanServerConnection.getAttribute(objectNameRequest, "DispatchCount");
+                ManagementResource.host.queueStatsMap.get("feed_out").insert(queueSize, dispatched);
+                int time ;
+                    time=1000;
+
+                Thread.sleep(time);
             } catch (MalformedObjectNameException e) {
                 e.printStackTrace();
             } catch (AttributeNotFoundException e) {

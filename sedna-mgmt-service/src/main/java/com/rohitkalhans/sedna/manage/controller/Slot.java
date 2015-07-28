@@ -64,7 +64,7 @@ public class Slot {
         File workingDir = FSUtils.createTempDirectory(this.config.getWorkingDir());
         builder.directory(workingDir);
         File logFile = new File(this.config.getWorkingDir(),
-                stageConfig.getName()+"-"+id+".log");
+                stageConfig.getName()+".log");
         log.info("Writing Log to " + logFile.getAbsolutePath());
         builder.redirectErrorStream(true);
         builder.redirectOutput(ProcessBuilder.Redirect.appendTo(logFile));

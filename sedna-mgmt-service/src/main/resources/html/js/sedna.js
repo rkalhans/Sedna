@@ -18,12 +18,10 @@ var url = "http://localhost:9000/hostStatus";
     mem+= parseInt(str.substring(0, str.length - 1));
     });
     $("#"+normKey+"-stat").empty().append('<span class="smallfont">Alloted memory: </span>'+mem/1024+'GB');
-    plotGraph(data["dataT"], "#graph");
-    plotGraph(data["dataT"], "#graph2");
-    plotGraph(data["dataT"], "#graph3");
-    plotGraph(data["dataT"], "#graph4");
    });
-
+   $.each(data["queueStatsMap"], function(k,v){
+   plotGraph(v["queueSize"],"#"+k);
+   })
  });
 }
 
@@ -31,7 +29,7 @@ var url = "http://localhost:9000/hostStatus";
 function plotGraph(data, divId){
 $(divId).empty();
 // define dimensions of graph
-		var m = [50, 10, 30, 60]; // margins
+		var m = [50, 10, 30, 90]; // margins
 		var w = 400 - m[1] - m[3]; // width
 		var h = 300 - m[0] - m[2]; // height
 		// X scale will fit all values from data[] within pixels 0-w
