@@ -9,8 +9,11 @@ import com.rohitkalhans.sedna.manage.payloads.JVMOpts;
 import com.rohitkalhans.sedna.manage.payloads.StageConfig;
 import com.rohitkalhans.sedna.manage.payloads.SuccessResponse;
 
+import javax.validation.constraints.Null;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by rkalhans on 09-07-2015.
@@ -21,6 +24,7 @@ public class ManagementResource {
 
     private ManagementConfig config;
     public static Host host;
+    static int k=5;
     ManagementResource(ManagementConfig config){
         this.config = config;
     }
@@ -62,7 +66,15 @@ public class ManagementResource {
     @Timed
     @Path("/hostStatus")
     public Host getStatus() throws JsonProcessingException {
-        String hostJson = new ObjectMapper().writeValueAsString(host);
+        try {
+            ArrayList<Integer> l = host.getDataT();
+            l.remove(0);
+            k+=(Math.random() * 5);
+            l.add(k);
+            host.setDataT(l);
+        }catch (NullPointerException npe){
+            throw new SednaException("Host not configured as yet.");
+        }
         return host;
     }
 

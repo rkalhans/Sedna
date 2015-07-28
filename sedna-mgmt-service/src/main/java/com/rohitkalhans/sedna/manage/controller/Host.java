@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.rohitkalhans.sedna.manage.exceptions.SednaException;
 import com.rohitkalhans.sedna.manage.payloads.JVMOpts;
+import com.rohitkalhans.sedna.manage.payloads.QueueStats;
 import com.rohitkalhans.sedna.manage.payloads.StageConfig;
 import com.rohitkalhans.sedna.manage.server.ManagementConfig;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by rkalhans on 19-07-2015.
@@ -36,12 +38,21 @@ public class Host {
     @JsonIgnore
     ManagementConfig managementConfig;
 
+    @JsonProperty
+    ArrayList<Integer> dataT = new ArrayList<>();
+    @JsonProperty
+    public Map<String, QueueStats> queueStatsMap = new ConcurrentHashMap<String, QueueStats>();
+
 
     public Host(JVMOpts JVMSize, int numSlots,
                  ManagementConfig managementConfig){
         this.managementConfig = managementConfig;
         this.jvmSize = JVMSize;
         this.numSlots = numSlots;
+        for(int i = 0; i<=60; i++)
+        {
+            dataT.add((int)(Math.random()*100));
+        }
     }
 
     public void addSlot(StageConfig stageConfig)
@@ -91,5 +102,9 @@ public class Host {
             }
             addSlotHelper(newStage);
         }
+    }
+
+    public void setDataT(ArrayList<Integer> dataT) {
+        this.dataT = dataT;
     }
 }
