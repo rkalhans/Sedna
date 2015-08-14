@@ -37,9 +37,6 @@ public class Host {
 
     @JsonIgnore
     ManagementConfig managementConfig;
-
-    @JsonProperty
-    ArrayList<Integer> dataT = new ArrayList<>();
     @JsonProperty
     public Map<String, QueueStats> queueStatsMap = new ConcurrentHashMap<String, QueueStats>();
 
@@ -49,9 +46,6 @@ public class Host {
         this.managementConfig = managementConfig;
         this.jvmSize = JVMSize;
         this.numSlots = numSlots;
-        for (int i = 0; i <= 60; i++) {
-            dataT.add((int) (Math.random() * 100));
-        }
     }
 
     public void addSlot(StageConfig stageConfig) {
@@ -101,9 +95,5 @@ public class Host {
             }
             addSlotHelper(newStage);
         }
-    }
-
-    public void setDataT(ArrayList<Integer> dataT) {
-        this.dataT = dataT;
     }
 }

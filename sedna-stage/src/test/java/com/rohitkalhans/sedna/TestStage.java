@@ -33,7 +33,7 @@ public class TestStage {
               threadpool.submit(new TestProducer());
             }
             threadpool.shutdown();
-            new TestConsumer().run();
+            //new TestConsumer().run();
             //stage.stop();
 
         } catch (Exception ex) {
@@ -57,7 +57,7 @@ public class TestStage {
                 // Create a Session
                 Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-                // Create the destination (Topic or Queue)
+                // Create the destination (T    opic or Queue)
                 Destination destination = session.createQueue("crawl_in");
 
                 // Create a MessageProducer from the Session to the Topic or Queue
@@ -67,7 +67,7 @@ public class TestStage {
                 // Create a messages
                 for(int i= 0; i<totalMessages; i++) {
                     Thread.sleep(20);
-                    String text = randomNumber(40,60)+","+randomNumber(120,190)+","+randomNumber(50,70);
+                    String text = randomNumber(120,160)+","+randomNumber(1800,1850)+","+randomNumber(50,70);
                     TextMessage message = session.createTextMessage(text);
                     // Tell the producer to send the message
                     System.out.println("Sent message: " +text);

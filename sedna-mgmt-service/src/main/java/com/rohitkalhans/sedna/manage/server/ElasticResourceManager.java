@@ -66,7 +66,7 @@ public class ElasticResourceManager implements Runnable {
         ManagementResource.host.queueStatsMap.put("crawl_in", new QueueStats());
         ManagementResource.host.queueStatsMap.put("crawlToParse", new QueueStats());
         ManagementResource.host.queueStatsMap.put("parseToFeed", new QueueStats());
-
+        ManagementResource.host.queueStatsMap.put("feed_out", new QueueStats());
     }
 
     ElasticResourceManager() {
@@ -140,22 +140,21 @@ public class ElasticResourceManager implements Runnable {
                         os.flush();
                         os.close();
 
-                        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                            BufferedReader br = new BufferedReader(new InputStreamReader(
-                                    (conn.getInputStream())));
-
-                            String output;
-                            System.out.println("Output from Server .... \n");
-                            while ((output = br.readLine()) != null) {
-                                System.out.println(output);
-                            }
-                        } else {
-                            waitTimeForSwitch = 15;
-                            break;
-
+                        if (conn.getResponseCode() == 400) {
+                            waitTimeForSwitch = 30;
                         }
+                        else
+                            waitTimeForSwitch = 15;
+                        break;
                     }
+
                 }
+                ObjectName objectNameRequest = new ObjectName(
+                        "org.apache.activemq:BrokerName=localhost,Type=Queue,Destination=feed_out");
+                queueSize = (Long) mBeanServerConnection.getAttribute(objectNameRequest, "QueueSize");
+                dispatched = (Long) mBeanServerConnection.getAttribute(objectNameRequest, "DispatchCount");
+                ManagementResource.host.queueStatsMap.get("feed_out").insert(queueSize, dispatched);
+
                 if(waitTimeForSwitch > 0) {
                     waitTimeForSwitch--;
                 }

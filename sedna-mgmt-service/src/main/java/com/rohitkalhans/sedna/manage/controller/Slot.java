@@ -84,7 +84,14 @@ public class Slot {
      public void stopSlot(){
 
          if(canStopSlot())
-            stageProcess.destroy();
+         {
+             stageProcess.destroy();
+             try {
+                 stageProcess.waitFor();
+             } catch (InterruptedException e) {
+                 log.error("Cannot wait to kill process");
+             }
+         }
          else throw new SednaException("Cannot stop slot since this has the Queue running.");
      }
 

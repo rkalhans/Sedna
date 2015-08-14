@@ -66,15 +66,8 @@ public class ManagementResource {
     @Timed
     @Path("/hostStatus")
     public Host getStatus() throws JsonProcessingException {
-        try {
-            ArrayList<Integer> l = host.getDataT();
-            l.remove(0);
-            k+=(Math.random() * 5);
-            l.add(k);
-            host.setDataT(l);
-        }catch (NullPointerException npe){
-            throw new SednaException("Host not configured as yet.");
-        }
+        if(host == null)
+            throw new SednaException("No host configured on this machine. use buildHost endpoint first.");
         return host;
     }
 
