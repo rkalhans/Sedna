@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Sedna Management Console</title>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="js/vendor/jquery-1.11.2.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="js/sedna.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="js/vendor/bootstrap.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="js/vendor/d3.min.js    "></script>
+
+    <link rel="stylesheet" type="text/css" href="css/simple.css">
+
+</head>
+
+<body>
+<h1> SEDNA VISUALIZATION CONSOLE</h1>
+<div class="container-fluid wrapper">
+    <div class="col-md-1 connector source">
+    </div>
+    <div class="col-md-2 pane">
+        <div class="header">CRAWL</div>
+        <div id="crawl-stat" class="stat"></div>
+        <div id="crawl-dis" class="stat"></div>
+        <div id="crawl"></div>
+    </div>
+    <div class="col-md-1 connector">
+
+    </div>
+    <div class="col-md-2 pane" >
+        <div class="header">PARSE</div>
+        <div id="parse-stat" class="stat"></div>
+        <div id="parse-dis" class="stat"></div>
+        <div id="parse"></div>
+        </div>
+    <div class="col-md-1 connector">
+
+    </div>
+
+    <div class="col-md-2 pane">
+        <div class="header">FEED</div>
+        <div id="feed-stat" class="stat"></div>
+        <div id="feed-dis" class="stat"></div>
+        <div id="feed"></div>
+    </div>
+    <div class="col-md-1 connector sink">
+
+    </div>
+    </div>
+
+<div class="container-fluid wrapper">
+    <div id="crawl_in" class="aGraph col-md-3" style="color:#fff"></div>
+    <div id="crawlToParse" class="aGraph col-md-3" style="color:#fff"></div>
+    <div id="parseToFeed" class="aGraph col-md-3" style="color:#fff"></div>
+    <div id="feed_out" class="aGraph col-md-3" style=" color:#fff"></div>
+</div>
+
+<div class="container-fluid wrapper">
+    <div  class="col-md-3 graphName" style="color:#fff">Pending Docs</div>
+    <div  class="col-md-3 graphName" style="color:#fff">Pending for Parse</div>
+    <div  class="col-md-3 graphName" style="color:#fff">Pending to be fed in</div>
+    <div  class="col-md-3 graphName" style=" color:#fff">Completed</div>
+</div>
+
+
+
+</body>
+
+</html>
